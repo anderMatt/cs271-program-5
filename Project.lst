@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
+Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:52:09
 Program 5     (program5.asm				     Page 1 - 1
 
 
@@ -36,12 +36,12 @@ Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
  00000000			.data
 
 				; (insert variable definitions here)
- 00000000 52 61 6E 64 6F	progTitle	BYTE	"Random Number Generator", 0
+ 00000000 52 61 6E 64 6F	progTitle		BYTE	"Random Number Generator", 0
 	   6D 20 4E 75 6D
 	   62 65 72 20 47
 	   65 6E 65 72 61
 	   74 6F 72 00
- 00000018 57 72 69 74 74	myName		BYTE	"Written By: Matthew Anderson",0
+ 00000018 57 72 69 74 74	myName			BYTE	"Written By: Matthew Anderson",0
 	   65 6E 20 42 79
 	   3A 20 4D 61 74
 	   74 68 65 77 20
@@ -83,54 +83,138 @@ Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
 	   6F 72 74 20 74
 	   68 65 6D 20 69
 	   6E 00
- 000000E2 64 65 73 63 65	instructions4	BYTE	"descending order",0
+ 000000E2 64 65 73 63 65	instructions4	BYTE	"descending order.",0
 	   6E 64 69 6E 67
 	   20 6F 72 64 65
-	   72 00
+	   72 2E 00
+
+ 000000F4 45 6E 74 65 72	dataPrompt		BYTE	"Enter sample size in [10, 200]: ",0
+	   20 73 61 6D 70
+	   6C 65 20 73 69
+	   7A 65 20 69 6E
+	   20 5B 31 30 2C
+	   20 32 30 30 5D
+	   3A 20 00
+ 00000115 56 61 6C 75 65	dataErr			BYTE	"Value must be in in [10, 200]! Try again: ",0
+	   20 6D 75 73 74
+	   20 62 65 20 69
+	   6E 20 69 6E 20
+	   5B 31 30 2C 20
+	   32 30 30 5D 21
+	   20 54 72 79 20
+	   61 67 61 69 6E
+	   3A 20 00
+
+ 00000140 00000000		sampleSize		DWORD	?			;how many random numbers to generate. User-entered value.
+ 00000144  000000C8 [		sampleArr		DWORD	200 DUP(?)
+	    00000000
+	   ]
+
 
  00000000			.code
  00000000			main PROC
- 00000000  E8 00000007			call	Introduction
+ 00000000  E8 00000011			call	Introduction
+ 00000005  68 00000140 R		push	OFFSET sampleSize		;Pass sample size to GetData
+ 0000000A  E8 00000062			call	GetData
 
 
 					exit	; exit to operating system
- 00000005  6A 00	   *	    push   +000000000h
- 00000007  E8 00000000 E   *	    call   ExitProcess
- 0000000C			main ENDP
+ 0000000F  6A 00	   *	    push   +000000000h
+ 00000011  E8 00000000 E   *	    call   ExitProcess
+ 00000016			main ENDP
 
-				;------------------------------
- 0000000C			Introduction PROC
+				;--------------------------------------------------
+ 00000016			Introduction PROC
 				;
 				; Prints a greeting message and
 				; instructions.
 				;
-				;------------------------------
- 0000000C  BA 00000000 R		mov		edx, OFFSET progTitle
- 00000011  E8 00000000 E		call	WriteString
- 00000016  E8 00000000 E		call	CrLf
- 0000001B  BA 00000018 R		mov		edx, OFFSET myName
- 00000020  E8 00000000 E		call	WriteString
- 00000025  E8 00000000 E		call	CrLf
- 0000002A  BA 00000035 R		mov		edx, OFFSET instructions1
- 0000002F  E8 00000000 E		call	WriteString
- 00000034  E8 00000000 E		call	CrLf
- 00000039  BA 0000006B R		mov		edx, OFFSET instructions2
- 0000003E  E8 00000000 E		call	WriteString
- 00000043  E8 00000000 E		call	CrLf
- 00000048  BA 000000A4 R		mov		edx, OFFSET instructions3
- 0000004D  E8 00000000 E		call	WriteString
- 00000052  E8 00000000 E		call	CrLf
- 00000057  BA 000000E2 R		mov		edx, OFFSET instructions4
- 0000005C  E8 00000000 E		call	WriteString
- 00000061  E8 00000000 E		call	CrLf
- 00000066  C3				ret
+				;--------------------------------------------------
+ 00000016  BA 00000000 R		mov		edx, OFFSET progTitle
+ 0000001B  E8 00000000 E		call	WriteString
+ 00000020  E8 00000000 E		call	CrLf
+ 00000025  BA 00000018 R		mov		edx, OFFSET myName
+ 0000002A  E8 00000000 E		call	WriteString
+ 0000002F  E8 00000000 E		call	CrLf
+ 00000034  BA 00000035 R		mov		edx, OFFSET instructions1
+ 00000039  E8 00000000 E		call	WriteString
+ 0000003E  E8 00000000 E		call	CrLf
+ 00000043  BA 0000006B R		mov		edx, OFFSET instructions2
+ 00000048  E8 00000000 E		call	WriteString
+ 0000004D  E8 00000000 E		call	CrLf
+ 00000052  BA 000000A4 R		mov		edx, OFFSET instructions3
+ 00000057  E8 00000000 E		call	WriteString
+ 0000005C  E8 00000000 E		call	CrLf
+ 00000061  BA 000000E2 R		mov		edx, OFFSET instructions4
+ 00000066  E8 00000000 E		call	WriteString
+ 0000006B  E8 00000000 E		call	CrLf
+ 00000070  C3				ret
 
- 00000067			Introduction ENDP
+ 00000071			Introduction ENDP
+
+				;--------------------------------------------------
+ 00000071			GetData PROC
+				;
+				; Prompts user to enter a number N in 
+				; [MIN_SAMPLE_SIZE, MAX_SAMPLE_SIZE]. If input is 
+				; outside of this range, prints error message and
+				; prompts again.
+				;
+				; Receives: Address of output variable on system stack.
+				; Returns: Output variable contains N.
+				;--------------------------------------------------
+ 00000071  55				push	ebp
+ 00000072  8B EC			mov		ebp, esp
+ 00000074  8B 75 08			mov		esi, [ebp + 8]		;ESI contains address of output variable.
+
+					; Prompt input.
+ 00000077  BA 000000F4 R		mov		edx, OFFSET dataPrompt
+ 0000007C  E8 00000000 E		call	WriteString
+
+ 00000081			getNum:
+ 00000081  E8 00000000 E		call	ReadInt
+ 00000086  E8 0000001E			call	IsValidSampleSize
+ 0000008B  74 11			jz		isValid
+
+					;Input was not valid. Print error, and try again.
+ 0000008D  BA 00000115 R		mov		edx, OFFSET dataErr
+ 00000092  E8 00000000 E		call	CrLf
+ 00000097  E8 00000000 E		call	WriteString
+ 0000009C  EB E3			jmp		getNum
+
+ 0000009E			isValid:
+ 0000009E  E8 00000000 E		call	CrLf
+ 000000A3  89 06			mov		[esi], eax		;Place entered number in output variable.
+ 000000A5  5D				pop		ebp
+ 000000A6  C2 0004			ret 4					;Remove output variable from stack.
+
+ 000000A9			GetData ENDP
+
+				;--------------------------------------------------
+ 000000A9			IsValidSampleSize PROC
+
+				; Validates user-entered sample size to be within
+				; [MIN_SAMPLE_SIZE, MAX_SAMPLE_SIZE].
+				;
+				; Receives: EAX = user-entered sample size.
+				; Returns: ZF = 1 if sample size is in the valid
+				; range; else ZF = 0.
+				;--------------------------------------------------
+ 000000A9  83 F8 0A			cmp		eax, MIN_SAMPLE_SIZE
+ 000000AC  7C 0C			jl		invalid 
+ 000000AE  3D 000000C8			cmp		eax, MAX_SAMPLE_SIZE
+ 000000B3  7F 05			jg		invalid 
+ 000000B5  A9 00000000			test	eax, 0		;Input is valid. Unset ZF.
+
+ 000000BA			invalid:
+ 000000BA  C3				ret
+
+ 000000BB			IsValidSampleSize ENDP
 
 				; (insert additional procedures here)
 
 				END main
-Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
+Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:52:09
 Program 5     (program5.asm				     Symbols 2 - 1
 
 
@@ -224,8 +308,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000000F3 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000067 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000464 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000BB Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -252,6 +336,9 @@ GetConsoleCP . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 GetConsoleCursorInfo . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetConsoleMode . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetConsoleScreenBufferInfo . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+GetData  . . . . . . . . . . . .	P Near	 00000071 _TEXT	Length= 00000038 Public STDCALL
+  getNum . . . . . . . . . . . .	L Near	 00000081 _TEXT	
+  isValid  . . . . . . . . . . .	L Near	 0000009E _TEXT	
 GetDateTime  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetFileTime  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetKeyState  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -271,8 +358,10 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-Introduction . . . . . . . . . .	P Near	 0000000C _TEXT	Length= 0000005B Public STDCALL
+Introduction . . . . . . . . . .	P Near	 00000016 _TEXT	Length= 0000005B Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+IsValidSampleSize  . . . . . . .	P Near	 000000A9 _TEXT	Length= 00000012 Public STDCALL
+  invalid  . . . . . . . . . . .	L Near	 000000BA _TEXT	
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MsgBoxAsk  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -333,7 +422,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000000C Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000016 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -560,6 +649,8 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+dataErr  . . . . . . . . . . . .	Byte	 00000115 _DATA	
+dataPrompt . . . . . . . . . . .	Byte	 000000F4 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
@@ -577,6 +668,8 @@ magenta  . . . . . . . . . . . .	Number	 00000005h
 myName . . . . . . . . . . . . .	Byte	 00000018 _DATA	
 progTitle  . . . . . . . . . . .	Byte	 00000000 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+sampleArr  . . . . . . . . . . .	DWord	 00000144 _DATA	
+sampleSize . . . . . . . . . . .	DWord	 00000140 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

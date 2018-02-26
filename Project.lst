@@ -1,11 +1,11 @@
-Microsoft (R) Macro Assembler Version 14.12.25831.0	    01/05/18 15:06:00
-#Program Template     (template.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
+Program 5     (program5.asm				     Page 1 - 1
 
 
-				TITLE Program Template     (template.asm)
+				TITLE Program 5     (program5.asm)
 
-				; Author:
-				; Course / Project ID                 Date:
+				; Author: Matthew Anderson
+				; CS 271 - Program 5                 Date: February 26, 2018
 				; Description:
 
 				INCLUDE Irvine32.inc
@@ -28,26 +28,110 @@ Microsoft (R) Macro Assembler Version 14.12.25831.0	    01/05/18 15:06:00
 			      C 
 
 				; (insert constant definitions here)
+ = 0000000A			MIN_SAMPLE_SIZE = 10
+ = 000000C8			MAX_SAMPLE_SIZE = 200
+ = 00000064			RANGE_MIN = 100
+ = 000003E7			RANGE_MAX = 999
 
  00000000			.data
 
 				; (insert variable definitions here)
+ 00000000 52 61 6E 64 6F	progTitle	BYTE	"Random Number Generator", 0
+	   6D 20 4E 75 6D
+	   62 65 72 20 47
+	   65 6E 65 72 61
+	   74 6F 72 00
+ 00000018 57 72 69 74 74	myName		BYTE	"Written By: Matthew Anderson",0
+	   65 6E 20 42 79
+	   3A 20 4D 61 74
+	   74 68 65 77 20
+	   41 6E 64 65 72
+	   73 6F 6E 00
+ 00000035 49 20 77 69 6C	instructions1	BYTE	"I will generate N random numbers in [100, 999], where",0
+	   6C 20 67 65 6E
+	   65 72 61 74 65
+	   20 4E 20 72 61
+	   6E 64 6F 6D 20
+	   6E 75 6D 62 65
+	   72 73 20 69 6E
+	   20 5B 31 30 30
+	   2C 20 39 39 39
+	   5D 2C 20 77 68
+	   65 72 65 00
+ 0000006B 4E 20 69 73 20	instructions2	BYTE	"N is a number of your choice in [10, 200]. Then, I will ",0
+	   61 20 6E 75 6D
+	   62 65 72 20 6F
+	   66 20 79 6F 75
+	   72 20 63 68 6F
+	   69 63 65 20 69
+	   6E 20 5B 31 30
+	   2C 20 32 30 30
+	   5D 2E 20 54 68
+	   65 6E 2C 20 49
+	   20 77 69 6C 6C
+	   20 00
+ 000000A4 64 69 73 70 6C	instructions3	BYTE	"display the generated numbers, their median, and sort them in",0
+	   61 79 20 74 68
+	   65 20 67 65 6E
+	   65 72 61 74 65
+	   64 20 6E 75 6D
+	   62 65 72 73 2C
+	   20 74 68 65 69
+	   72 20 6D 65 64
+	   69 61 6E 2C 20
+	   61 6E 64 20 73
+	   6F 72 74 20 74
+	   68 65 6D 20 69
+	   6E 00
+ 000000E2 64 65 73 63 65	instructions4	BYTE	"descending order",0
+	   6E 64 69 6E 67
+	   20 6F 72 64 65
+	   72 00
 
  00000000			.code
  00000000			main PROC
+ 00000000  E8 00000007			call	Introduction
 
-				; (insert executable instructions here)
 
 					exit	; exit to operating system
- 00000000  6A 00	   *	    push   +000000000h
- 00000002  E8 00000000 E   *	    call   ExitProcess
- 00000007			main ENDP
+ 00000005  6A 00	   *	    push   +000000000h
+ 00000007  E8 00000000 E   *	    call   ExitProcess
+ 0000000C			main ENDP
+
+				;------------------------------
+ 0000000C			Introduction PROC
+				;
+				; Prints a greeting message and
+				; instructions.
+				;
+				;------------------------------
+ 0000000C  BA 00000000 R		mov		edx, OFFSET progTitle
+ 00000011  E8 00000000 E		call	WriteString
+ 00000016  E8 00000000 E		call	CrLf
+ 0000001B  BA 00000018 R		mov		edx, OFFSET myName
+ 00000020  E8 00000000 E		call	WriteString
+ 00000025  E8 00000000 E		call	CrLf
+ 0000002A  BA 00000035 R		mov		edx, OFFSET instructions1
+ 0000002F  E8 00000000 E		call	WriteString
+ 00000034  E8 00000000 E		call	CrLf
+ 00000039  BA 0000006B R		mov		edx, OFFSET instructions2
+ 0000003E  E8 00000000 E		call	WriteString
+ 00000043  E8 00000000 E		call	CrLf
+ 00000048  BA 000000A4 R		mov		edx, OFFSET instructions3
+ 0000004D  E8 00000000 E		call	WriteString
+ 00000052  E8 00000000 E		call	CrLf
+ 00000057  BA 000000E2 R		mov		edx, OFFSET instructions4
+ 0000005C  E8 00000000 E		call	WriteString
+ 00000061  E8 00000000 E		call	CrLf
+ 00000066  C3				ret
+
+ 00000067			Introduction ENDP
 
 				; (insert additional procedures here)
 
 				END main
-Microsoft (R) Macro Assembler Version 14.12.25831.0	    01/05/18 15:06:00
-#Program Template     (template.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.12.25831.0	    02/26/18 17:13:42
+Program 5     (program5.asm				     Symbols 2 - 1
 
 
 
@@ -140,8 +224,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000007 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000000F3 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000067 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -187,6 +271,7 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+Introduction . . . . . . . . . .	P Near	 0000000C _TEXT	Length= 0000005B Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LocalFree  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 MessageBoxA  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -248,7 +333,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000007 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000000C Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -340,6 +425,7 @@ KEY_EVENT  . . . . . . . . . . .	Number	 00000001h
 KEY_MASKS  . . . . . . . . . . .	Number	 0000001Fh   
 LEFT_ALT_PRESSED . . . . . . . .	Number	 00000002h   
 LEFT_CTRL_PRESSED  . . . . . . .	Number	 00000008h   
+MAX_SAMPLE_SIZE  . . . . . . . .	Number	 000000C8h   
 MB_ABORTRETRYIGNORE  . . . . . .	Number	 00000002h   
 MB_APPLMODAL . . . . . . . . . .	Number	 00000000h   
 MB_CANCELTRYCONTINUE . . . . . .	Number	 00000006h   
@@ -365,6 +451,7 @@ MB_USERICON  . . . . . . . . . .	Number	 00000080h
 MB_YESNOCANCEL . . . . . . . . .	Number	 00000003h   
 MB_YESNO . . . . . . . . . . . .	Number	 00000004h   
 MENU_EVENT . . . . . . . . . . .	Number	 00000008h   
+MIN_SAMPLE_SIZE  . . . . . . . .	Number	 0000000Ah   
 MOUSE_EVENT  . . . . . . . . . .	Number	 00000002h   
 MessageBox . . . . . . . . . . .	Text   	 MessageBoxA
 NULL . . . . . . . . . . . . . .	Number	 00000000h   
@@ -372,6 +459,8 @@ NUMLOCK_ON . . . . . . . . . . .	Number	 00000020h
 OPEN_ALWAYS  . . . . . . . . . .	Number	 00000004h   
 OPEN_EXISTING  . . . . . . . . .	Number	 00000003h   
 PeekConsoleInput . . . . . . . .	Text   	 PeekConsoleInputA
+RANGE_MAX  . . . . . . . . . . .	Number	 000003E7h   
+RANGE_MIN  . . . . . . . . . . .	Number	 00000064h   
 RIGHT_ALT_PRESSED  . . . . . . .	Number	 00000001h   
 RIGHT_CTRL_PRESSED . . . . . . .	Number	 00000004h   
 ReadConsoleInput . . . . . . . .	Text   	 ReadConsoleInputA
@@ -474,6 +563,10 @@ cyan . . . . . . . . . . . . . .	Number	 00000003h
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
+instructions1  . . . . . . . . .	Byte	 00000035 _DATA	
+instructions2  . . . . . . . . .	Byte	 0000006B _DATA	
+instructions3  . . . . . . . . .	Byte	 000000A4 _DATA	
+instructions4  . . . . . . . . .	Byte	 000000E2 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -481,6 +574,8 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+myName . . . . . . . . . . . . .	Byte	 00000018 _DATA	
+progTitle  . . . . . . . . . . .	Byte	 00000000 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA

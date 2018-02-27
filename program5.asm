@@ -25,14 +25,28 @@ instructions4	BYTE	"descending order.",0
 dataPrompt		BYTE	"Enter sample size in [10, 200]: ",0
 dataErr			BYTE	"Value must be in in [10, 200]! Try again: ",0
 
+unsorted		BYTE	"Unsorted Array: ",0
+sorted			BYTE	"Sorted Array: ",0
+gutter			BYTE	"  ",0
+
 sampleSize		DWORD	?			;how many random numbers to generate. User-entered value.
 sampleArr		DWORD	200 DUP(?)
 
 
 .code
 main PROC
+	call	Randomize				;Seed random generator.
 	call	Introduction
-	push	OFFSET sampleSize		;Pass sample size to GetData
+	push	OFFSET sampleSize		;Pass sample size to GetData.
+	call	GetData
+	push	OFFSET sampleArr		;Pass array and size to FillArray.
+	push	sampleSize
+	call	FillArray
+
+	push	OFFSET sampleArr
+	push	sampleSize
+	push	OFFSET unsorted
+	call	Display
 	call	GetData
 
 
@@ -108,7 +122,7 @@ GetData ENDP
 
 ;--------------------------------------------------
 IsValidSampleSize PROC
-
+;
 ; Validates user-entered sample size to be within
 ; [MIN_SAMPLE_SIZE, MAX_SAMPLE_SIZE].
 ;
@@ -127,6 +141,98 @@ invalid:
 
 IsValidSampleSize ENDP
 
-; (insert additional procedures here)
+;--------------------------------------------------
+FillArray PROC
+;
+; Fills an array with N random numbers, each in
+; the range [100, 999].
+;
+; Receives stack parameters (A, N):
+;	A: address of the array to fill.
+;   N: random number sample size.
+;
+; Returns: A[0...N-1] contains random numbers.
+;--------------------------------------------------
+	push	ebp
+	mov		ebp, esp
+	mov		edi, [ebp + 12]		;Load address of output array.
+	mov		ecx, [ebp + 8]		;Load sample size.
+
+putNext:						;Loads next element with a random number.
+
+	;Load EAX with range for RandomRange call: HI - LO + 1
+	mov		eax, RANGE_MAX 
+	mov		ebx, RANGE_MIN
+	sub		eax, ebx
+	inc		eax
+
+	call	RandomRange
+	add		eax, RANGE_MIN		;Get generated number into [MIN, MAX]
+
+	;Place random number into next element.
+	mov		[edi], eax
+	add		edi, SIZEOF DWORD	;Increment to next element.
+	loop	putNext
+
+	pop		ebp
+	ret 8
+
+FillArray ENDP
+
+;--------------------------------------------------
+Display PROC
+;
+; Prints the contents of an array, 10 elements per
+; line.
+;
+; Receives stack parameters (A, N, T):
+;	A: address of the array.
+;   N: size of the array.
+;   T: title of the array.
+;--------------------------------------------------
+	push	ebp
+	mov		ebp, esp
+
+	;Print array title.
+	mov		edx, [ebp + 8]					;Load title for printing.
+	;mov	edx, OFFSET unsorted
+	call	WriteString
+	call	CrLf
+
+	;Loop through the array, printing each element.
+	mov		ecx, [ebp + 12]					;Load size of array.
+	mov		esi, [ebp + 16]					;Load the array.
+	mov		edi, 0							;Keep track of numbers printed so far on current line.
+
+	call	CrLf
+
+printNext:
+	;Print space between numbers.
+	mov		edx, OFFSET gutter
+	call	WriteString
+
+	inc		edi
+	mov		eax, [esi]
+	call	WriteDec
+	add		esi, SIZEOF DWORD				;Advance to next element.
+
+	;Check if we need to print a new line - 10 numbers per line.
+	xor		edx, edx
+	mov		ebx, 10
+	mov		eax, edi
+	div		ebx
+	cmp		edx, 0
+	jne		doLoop						;Less than 10 numbers printed on current line.
+
+	call	CrLf						;Divisible by 10. Add a new line.
+	mov		edi, 0						;Reset print count for current line.
+
+doLoop:
+	loop	printNext
+
+	pop		ebp
+	ret 12
+
+Display ENDP
 
 END main

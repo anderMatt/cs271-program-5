@@ -7,6 +7,7 @@ TITLE Program 5     (program5.asm)
 INCLUDE Irvine32.inc
 
 ; (insert constant definitions here)
+
 MIN_SAMPLE_SIZE = 10
 MAX_SAMPLE_SIZE = 200
 RANGE_MIN = 100
@@ -26,7 +27,7 @@ dataPrompt		BYTE	"Enter sample size in [10, 200]: ",0
 dataErr			BYTE	"Value must be in in [10, 200]! Try again: ",0
 
 unsorted		BYTE	"Unsorted Array: ",0
-sorted			BYTE	"Sorted Array: ",0
+sorted			BYTE	"Sorted Array (descending): ",0
 gutter			BYTE	"  ",0
 
 sampleSize		DWORD	?			;how many random numbers to generate. User-entered value.
@@ -46,6 +47,15 @@ main PROC
 	push	OFFSET sampleArr
 	push	sampleSize
 	push	OFFSET unsorted
+	call	Display
+
+	push	OFFSET sampleArr
+	push	sampleSize
+	call	SortArray
+
+	push	OFFSET sampleArr
+	push	sampleSize
+	push	OFFSET sorted
 	call	Display
 
 	;------------------------------
@@ -244,11 +254,76 @@ printNext:
 
 doLoop:
 	loop	printNext
+	call	CrLf
+	call	CrLf
 
 	pop		ebp
 	ret 12
 
 Display ENDP
+
+;--------------------------------------------------
+SortArray PROC
+; Sorts an array into descending order. Assumes
+; type DWORD. Implemented using selection sort.
+;
+; Receives stack parameters (A, N):
+;	A: address of the array to sort.
+;	N: size of the array.
+;
+;--------------------------------------------------
+	push	ebp
+	mov		ebp, esp
+	mov		esi, [ebp + 12]			;ESI contains address of the array.
+	mov		ecx, [ebp + 8]			;ECX contains size of the array.
+
+	;Load last address into EAX. This will be used for comparisons when iterating.
+	;Last address = @ + (N-1 * 4)
+	mov		eax, ecx
+	mov		ebx, 4
+	mul		ebx						
+	add		eax, esi			;EAX contains address of last element of the array.
+
+outer:
+	;Check if we're done: i >= (size of array) - 1
+	mov		ebx, eax				;EAX is address of the last element of the array.
+	sub		ebx, 4					;Last element - 1
+	cmp		esi, ebx				;ESI = i
+	jge		sortDone
+
+	mov		ebx, esi				;EBX will hold current max index. Starts as i.
+	mov		edi, esi				
+	add		edi, 4					;EDIT = j for the inner loop: j = i + 1
+
+inner:
+	cmp		edi, eax				;Check if j is at the last element of the array.
+	jge		doneInner				;Done inner loop when j = @ arr[N-1]
+
+	mov		ecx, [ebx]				;ECX = value at current max index
+	cmp		ecx, [edi]				;EDI = @j.
+
+	jge		innerAgain
+	mov		ebx, edi				;arr[maxIndex] < arr[j]. Update max index = j.
+
+innerAgain:
+	add		edi, 4					;Advance j = j + 1.
+	jmp		inner
+	
+
+doneInner:
+	;Swap elements at arr[i], and arr[maxIndex].
+	push	esi
+	push	ebx						;EBX holds max index.
+	call	Swap
+	add		esi, 4					;Advance i = i+1
+	jmp		outer
+	;loop	outer
+
+sortDone:
+	pop		ebp
+	ret 8
+
+SortArray ENDP
 
 
 ;--------------------------------------------------
@@ -263,18 +338,24 @@ Swap PROC
 ;	
 ;	Returns: [A] = [B], [B] = [A]
 ;--------------------------------------------------
+	push	eax
+	push	ebx
 	push	ebp
+
 	mov		ebp, esp
-	mov		eax, [ebp + 12]			;eax contains address of first variable. Add 40 because of pushad.
+	mov		eax, [ebp + 20]			;eax contains address of first variable. Add 40 because of pushad.
 	mov		ebx, [eax]				;ebx contains VALUE of first variable.
 
-	mov		ecx, [ebp + 8]			;ecx contains address of second variable.
+	mov		ecx, [ebp + 16]			;ecx contains address of second variable.
 	mov		edx, [ecx]				;edx contains VALUE of second variable.
 
 	mov		[eax], edx
 	mov		[ecx], ebx
 
 	pop		ebp
+	pop		ebx
+	pop		eax
+
 	ret 8							;remove two memory addresses from stack.
 Swap ENDP
 END main

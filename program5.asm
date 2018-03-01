@@ -47,7 +47,22 @@ main PROC
 	push	sampleSize
 	push	OFFSET unsorted
 	call	Display
-	call	GetData
+
+	;------------------------------
+	;TEST SWAPPING FIRST AND SECOND ARRAY ELEMENTS.
+	;------------------------------
+	;push	OFFSET sampleArr
+	;mov		eax, OFFSET sampleArr
+	;add		eax, 4
+	;push	eax
+	;call	Swap
+	
+	;push	OFFSET sampleArr
+	;push	sampleSize
+	;push	OFFSET sorted
+	;call	Display
+	;------------------------------
+	;------------------------------
 
 
 	exit	; exit to operating system
@@ -171,7 +186,7 @@ putNext:						;Loads next element with a random number.
 
 	;Place random number into next element.
 	mov		[edi], eax
-	add		edi, SIZEOF DWORD	;Increment to next element.
+	add		edi, TYPE DWORD	;Increment to next element.
 	loop	putNext
 
 	pop		ebp
@@ -214,7 +229,7 @@ printNext:
 	inc		edi
 	mov		eax, [esi]
 	call	WriteDec
-	add		esi, SIZEOF DWORD				;Advance to next element.
+	add		esi, TYPE DWORD				;Advance to next element.
 
 	;Check if we need to print a new line - 10 numbers per line.
 	xor		edx, edx
@@ -235,4 +250,31 @@ doLoop:
 
 Display ENDP
 
+
+;--------------------------------------------------
+Swap PROC
+;
+; Swaps the values of two memory addresses. Assumes
+; DWORD type.
+;
+; Receives stack parameters (A, B):
+;	A: address of first variable
+;	B: address of second variable
+;	
+;	Returns: [A] = [B], [B] = [A]
+;--------------------------------------------------
+	push	ebp
+	mov		ebp, esp
+	mov		eax, [ebp + 12]			;eax contains address of first variable. Add 40 because of pushad.
+	mov		ebx, [eax]				;ebx contains VALUE of first variable.
+
+	mov		ecx, [ebp + 8]			;ecx contains address of second variable.
+	mov		edx, [ecx]				;edx contains VALUE of second variable.
+
+	mov		[eax], edx
+	mov		[ecx], ebx
+
+	pop		ebp
+	ret 8							;remove two memory addresses from stack.
+Swap ENDP
 END main

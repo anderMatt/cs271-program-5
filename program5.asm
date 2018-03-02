@@ -33,6 +33,13 @@ gutter			BYTE	"  ",0
 sampleSize		DWORD	?			;how many random numbers to generate. User-entered value.
 sampleArr		DWORD	200 DUP(?)
 
+;-----------------------------------------------------------------------------------------
+;FOR TESTING THE MEDIAN
+;-----------------------------------------------------------------------------------------
+theMedian		DWORD ?
+medianStr		BYTE "The median is: ",0
+;-----------------------------------------------------------------------------------------
+
 
 .code
 main PROC
@@ -57,6 +64,19 @@ main PROC
 	push	sampleSize
 	push	OFFSET sorted
 	call	Display
+
+	;TESTING MEDIAN
+	push	OFFSET sampleArr
+	push	sampleSize
+	push	OFFSET theMedian
+	call	GetMedian
+
+	mov		edx, OFFSET medianStr
+	call	WriteString
+	mov		eax, theMedian
+	call	WriteDec
+	
+	;DONE TESTING MEDIAN
 
 	;------------------------------
 	;TEST SWAPPING FIRST AND SECOND ARRAY ELEMENTS.
@@ -358,4 +378,103 @@ Swap PROC
 
 	ret 8							;remove two memory addresses from stack.
 Swap ENDP
+
+
+;--------------------------------------------------
+GetMedian PROC
+;
+; Finds the median value of an array.
+; 
+;
+; Preconditions: The array is sorted.
+; Receives stack parameters (A, N, O):
+;	A: address of the array.
+;	N: size of the array.
+;	O: address of the output variable.
+;
+;--------------------------------------------------
+
+;If array is odd length, median is arr[(N-1)/2.
+;If array is even length, median is 
+; arr[(N/2)-1] + arr[N/2]
+
+	push	ebp
+	mov		ebp, esp
+
+	mov		esi, [ebp + 16]			;ESI = @ of array.
+	mov		ecx, [ebp + 12]			;ECX = N.
+	mov		edi, [ebp + 8]			;EDI = output variable.
+
+	;Check if array is even or odd length.
+	xor		edx, edx
+	mov		eax, ecx
+	mov		ebx, 2
+	div		ebx
+	cmp		edx, 0
+	je		lenEven
+
+	;Array is odd length. Median index is (N-1)/2
+	mov		eax, ecx				;EAX = N
+	dec		eax						;EAX = N - 1
+	xor		edx, edx
+	mov		ebx, 2
+	div		ebx						;EAX = (N-1)/2
+	mov		ebx, 4
+	mul		ebx						;EAX = (N-1)/2 * 4, the memory offset of median.
+
+	mov		ebx, esi				;EBX = @ array.
+	add		ebx, eax				;EBX = @ of median element.
+	mov		eax, [ebx]				;EAX = value of median element.
+	mov		[edi], eax
+
+	jmp		return
+
+lenEven:
+	;Get first middle number: N/2 - 1
+	mov		eax, ecx				;EAX = N
+	mov		ebx, 2					
+	xor		edx, edx
+	div		ebx						;EAX = (N/2)
+
+	dec		eax						;EAX = (N/2) - 1, index of first middle number.
+	mov		ebx, 4
+	mul		ebx						;EAX = ((N/2)-1) * 4, mem. offset of middle element.
+
+	mov		ebx, esi				;EBX = @ array.
+	add		ebx, eax				;EBX = @ + offset = mem. address of middle element.
+	mov		eax, [ebx]
+	push	eax						;Save first middle number.
+
+	;Get second middle number: N/2
+	mov		eax, ecx				;EAX = N
+	mov		ebx, 2
+	xor		edx, edx
+	mul		ebx						;EAX = (N/2)*4 = N * 2
+
+	mov		ebx, esi				;EBX = @ of array.
+	add		ebx, esi				;EBX = @ + offset = mem. address of middle element.
+	mov		eax, [ebx]				;EAX = value of middle element.
+
+	;Median is the average of the two middle numbers.
+	pop		ebx						;Get first middle number.
+	add		eax, ebx
+	mov		ebx, 2
+	xor		edx, edx
+	div		ebx						;EAX = median value.
+
+	mov		[edi], ebx
+
+return:
+	pop		ebp
+	ret		12
+
+GetMedian ENDP
+
+;--------------------------------------------------
+PrintMedian PROC
+;
+;
+;--------------------------------------------------
+
+PrintMedian ENDP
 END main

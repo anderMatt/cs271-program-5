@@ -66,6 +66,7 @@ main PROC
 	call	Display
 
 	;TESTING MEDIAN
+	call	CrLf
 	push	OFFSET sampleArr
 	push	sampleSize
 	push	OFFSET theMedian
@@ -75,6 +76,7 @@ main PROC
 	call	WriteString
 	mov		eax, theMedian
 	call	WriteDec
+	call	CrLf
 	
 	;DONE TESTING MEDIAN
 
@@ -452,7 +454,7 @@ lenEven:
 	mul		ebx						;EAX = (N/2)*4 = N * 2
 
 	mov		ebx, esi				;EBX = @ of array.
-	add		ebx, esi				;EBX = @ + offset = mem. address of middle element.
+	add		ebx, eax				;EBX = @ + offset = mem. address of middle element.
 	mov		eax, [ebx]				;EAX = value of middle element.
 
 	;Median is the average of the two middle numbers.
@@ -462,7 +464,7 @@ lenEven:
 	xor		edx, edx
 	div		ebx						;EAX = median value.
 
-	mov		[edi], ebx
+	mov		[edi], eax
 
 return:
 	pop		ebp

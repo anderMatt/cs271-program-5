@@ -1,12 +1,15 @@
 TITLE Program 5     (program5.asm)
 
-; Author: Matthew Anderson
-; CS 271 - Program 5                 Date: February 26, 2018
-; Description:
+; Author: Matthew Anderson			 anderma8@oregonstate.edu
+; CS 271 - Program 5                 Date: March 1, 2018
+;
+; Description: Generates a sample of N random numbers in [100, 999], where N
+; is a user-entered value in [10, 200]. Populates an array with these numbers,
+; and sorts the array into descending order. Prints contents of both the sorted
+; and unsorted arrays. Finally, computes and displays the median value of the
+; sorted array.
 
 INCLUDE Irvine32.inc
-
-; (insert constant definitions here)
 
 MIN_SAMPLE_SIZE = 10
 MAX_SAMPLE_SIZE = 200
@@ -15,13 +18,12 @@ RANGE_MAX = 999
 
 .data
 
-; (insert variable definitions here)
 progTitle		BYTE	"Random Number Generator", 0
 myName			BYTE	"Written By: Matthew Anderson",0
 instructions1	BYTE	"I will generate N random numbers in [100, 999], where",0
 instructions2	BYTE	"N is a number of your choice in [10, 200]. Then, I will ",0
-instructions3	BYTE	"display the generated numbers, their median, and sort them in",0
-instructions4	BYTE	"descending order.",0
+instructions3	BYTE	"display the generated numbers, sort them in",0
+instructions4	BYTE	"descending order, and compute the median value.",0
 
 dataPrompt		BYTE	"Enter sample size in [10, 200]: ",0
 dataErr			BYTE	"Value must be in in [10, 200]! Try again: ",0
@@ -81,7 +83,7 @@ main ENDP
 ;--------------------------------------------------
 Introduction PROC
 ;
-; Prints a greeting message and
+; Prints a greeting message and program
 ; instructions.
 ;
 ;--------------------------------------------------
@@ -90,6 +92,7 @@ Introduction PROC
 	call	CrLf
 	mov		edx, OFFSET myName
 	call	WriteString
+	call	CrLf
 	call	CrLf
 	mov		edx, OFFSET instructions1
 	call	WriteString
@@ -103,6 +106,8 @@ Introduction PROC
 	mov		edx, OFFSET instructions4
 	call	WriteString
 	call	CrLf
+	call	CrLf
+
 	ret
 
 Introduction ENDP
@@ -141,6 +146,7 @@ isValid:
 	call	CrLf
 	mov		[esi], eax		;Place entered number in output variable.
 	pop		ebp
+
 	ret 4					;Remove output variable from stack.
 
 GetData ENDP
@@ -159,9 +165,9 @@ IsValidSampleSize PROC
 	jl		invalid 
 	cmp		eax, MAX_SAMPLE_SIZE
 	jg		invalid 
-	test	eax, 0		;Input is valid. Unset ZF.
+	test	eax, 0				;Input is valid. Unset ZF.
 
-invalid:
+invalid:						;ZF = 1 since JL or JG caused a jump.
 	ret
 
 IsValidSampleSize ENDP
@@ -317,14 +323,13 @@ doneInner:
 	call	Swap
 	add		esi, 4					;Advance i = i+1
 	jmp		outer
-	;loop	outer
 
 sortDone:
 	pop		ebp
+
 	ret 8
 
 SortArray ENDP
-
 
 ;--------------------------------------------------
 Swap PROC
@@ -357,6 +362,7 @@ Swap PROC
 	pop		eax
 
 	ret 8							;remove two memory addresses from stack.
+
 Swap ENDP
 
 

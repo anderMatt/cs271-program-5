@@ -29,73 +29,51 @@ dataErr			BYTE	"Value must be in in [10, 200]! Try again: ",0
 unsorted		BYTE	"Unsorted Array: ",0
 sorted			BYTE	"Sorted Array (descending): ",0
 gutter			BYTE	"  ",0
+medianStr		BYTE	"The median is: ",0
 
 sampleSize		DWORD	?			;how many random numbers to generate. User-entered value.
 sampleArr		DWORD	200 DUP(?)
-
-;-----------------------------------------------------------------------------------------
-;FOR TESTING THE MEDIAN
-;-----------------------------------------------------------------------------------------
 theMedian		DWORD ?
-medianStr		BYTE "The median is: ",0
-;-----------------------------------------------------------------------------------------
 
 
 .code
 main PROC
 	call	Randomize				;Seed random generator.
 	call	Introduction
-	push	OFFSET sampleSize		;Pass sample size to GetData.
-	call	GetData
-	push	OFFSET sampleArr		;Pass array and size to FillArray.
-	push	sampleSize
-	call	FillArray
+	push	OFFSET sampleSize	
+	call	GetData					;sampleSize = value entered by user.
 
+	push	OFFSET sampleArr		
+	push	sampleSize
+	call	FillArray				;sampleArr = array of random numbers.
+
+	;Print unsorted array.
 	push	OFFSET sampleArr
 	push	sampleSize
 	push	OFFSET unsorted
 	call	Display
 
+	;Sort the array.
 	push	OFFSET sampleArr
 	push	sampleSize
 	call	SortArray
 
+	;Print the sorted array.
 	push	OFFSET sampleArr
 	push	sampleSize
 	push	OFFSET sorted
 	call	Display
 
-	;TESTING MEDIAN
-	call	CrLf
+	;Calculate the median.
 	push	OFFSET sampleArr
 	push	sampleSize
 	push	OFFSET theMedian
 	call	GetMedian
 
-	mov		edx, OFFSET medianStr
-	call	WriteString
-	mov		eax, theMedian
-	call	WriteDec
-	call	CrLf
-	
-	;DONE TESTING MEDIAN
-
-	;------------------------------
-	;TEST SWAPPING FIRST AND SECOND ARRAY ELEMENTS.
-	;------------------------------
-	;push	OFFSET sampleArr
-	;mov		eax, OFFSET sampleArr
-	;add		eax, 4
-	;push	eax
-	;call	Swap
-	
-	;push	OFFSET sampleArr
-	;push	sampleSize
-	;push	OFFSET sorted
-	;call	Display
-	;------------------------------
-	;------------------------------
-
+	;Report the median
+	push	theMedian
+	push	OFFSET medianStr
+	call	PrintMedian
 
 	exit	; exit to operating system
 main ENDP
@@ -475,8 +453,26 @@ GetMedian ENDP
 ;--------------------------------------------------
 PrintMedian PROC
 ;
+;Reports the median of the array.
 ;
+; Receives stack parameters: (N, S)
+;	N: median value.
+;	S: address of string message to print.
 ;--------------------------------------------------
+	push	ebp
+	mov		ebp, esp
+
+	mov		eax, [ebp + 12]		;EAX = N.
+	mov		edx, [ebp + 8]		;EDX = @ of string.
+
+	call	WriteString
+	call	WriteDec
+	call	CrLf
+	call	CrLf
+
+	pop		ebp
+	ret		8
 
 PrintMedian ENDP
+
 END main
